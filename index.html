@@ -6,7 +6,6 @@
   <title>CHRO AOP Planner — Executive Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root {
       --primary: #0f172a;
@@ -105,6 +104,8 @@
       transition: all 0.2s;
       box-shadow: var(--shadow);
       z-index: 2;
+      text-decoration: none;
+      display: inline-block;
     }
 
     .export-btn:hover {
@@ -116,7 +117,7 @@
     /* KPI Strip - Super Compact */
     .kpi-strip {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 0.65rem;
       margin-bottom: 1rem;
     }
@@ -292,6 +293,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.8rem;
+      table-layout: fixed;
     }
 
     thead {
@@ -300,17 +302,29 @@
     }
 
     th {
-      padding: 0.65rem;
-      text-align: left;
+      padding: 0.65rem 0.4rem;
+      text-align: center;
       font-weight: 600;
       text-transform: uppercase;
       font-size: 0.65rem;
       letter-spacing: 0.3px;
+      width: auto;
     }
 
     td {
-      padding: 0.65rem;
+      padding: 0.65rem 0.4rem;
       border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    td:first-child {
+      text-align: left;
+      padding-left: 0.65rem;
+    }
+
+    th:first-child {
+      text-align: left;
+      padding-left: 0.65rem;
     }
 
     tbody tr:hover {
@@ -318,7 +332,6 @@
     }
 
     .number-cell {
-      text-align: center;
       font-variant-numeric: tabular-nums;
       font-weight: 500;
     }
@@ -389,9 +402,9 @@
         <h1>CHRO AOP Planner</h1>
         <p class="subtitle">Executive Workforce Planning Dashboard</p>
       </div>
-      <button class="export-btn" onclick="exportToExcel()">
-        <span style="margin-right: 0.3rem;">📥</span> Export to Excel
-      </button>
+      <a href="https://docs.google.com/spreadsheets/d/1YicOK3KZ4wysN8SlWAqXiciYDrgIXzzIdeQXFlFwQjw/edit?gid=0#gid=0" target="_blank" class="export-btn">
+        <span style="margin-right: 0.3rem;">📊</span> Open in Google Sheets
+      </a>
     </div>
 
     <!-- KPI Strip -->
@@ -404,14 +417,8 @@
 
       <div class="kpi-card" style="border-top-color: #f59e0b;">
         <span class="kpi-label">Peak Shortfall</span>
-        <span class="kpi-value" id="kpi-peak-shortfall">0.0</span>
+        <span class="kpi-value" id="kpi-peak-shortfall">0</span>
         <span class="kpi-subtext">Max recruiters</span>
-      </div>
-
-      <div class="kpi-card" style="border-top-color: #ef4444;">
-        <span class="kpi-label">Agency Risk</span>
-        <span class="kpi-value" id="kpi-agency-cost">$0K</span>
-        <span class="kpi-subtext">External cost</span>
       </div>
 
       <div class="kpi-card" style="border-top-color: #6366f1;">
@@ -544,8 +551,9 @@
             <th class="number-cell">Screens</th>
             <th class="number-cell">Interviews</th>
             <th class="number-cell">Offers</th>
-            <th class="number-cell">Int. Needed</th>
-            <th class="number-cell">Int. Gap</th>
+            <th class="number-cell">Interviewer Needed</th>
+            <th class="number-cell">Interviewer Available</th>
+            <th class="number-cell">Interviewer Gap</th>
           </tr>
         </thead>
         <tbody id="tableBody">
@@ -629,11 +637,9 @@
       const targetHC = parseFloat(document.getElementById('targetHC').value);
       const gap = targetHC - endingHC;
       const peakShortfall = Math.max(...monthlyData.map(m => Math.abs(Math.min(0, m.interviewerGap))));
-      const agencyCost = peakShortfall * 90000;
 
       document.getElementById('kpi-total-hires').textContent = totalHires;
-      document.getElementById('kpi-peak-shortfall').textContent = peakShortfall.toFixed(1);
-      document.getElementById('kpi-agency-cost').textContent = '$' + (agencyCost / 1000).toFixed(0) + 'K';
+      document.getElementById('kpi-peak-shortfall').textContent = Math.round(peakShortfall);
       document.getElementById('kpi-attrition').textContent = totalAttrition;
       document.getElementById('kpi-ending-hc').textContent = endingHC;
       document.getElementById('kpi-gap').textContent = gap;
@@ -656,8 +662,9 @@
           <td class="number-cell">${data.screens}</td>
           <td class="number-cell">${data.interviews}</td>
           <td class="number-cell">${data.offers}</td>
-          <td class="number-cell">${data.interviewersNeeded.toFixed(1)}</td>
-          <td class="number-cell ${data.interviewerGap < 0 ? 'warning' : 'positive'}">${data.interviewerGap > 0 ? '+' : ''}${data.interviewerGap}</td>
+          <td class="number-cell">${Math.round(data.interviewersNeeded)}</td>
+          <td class="number-cell">${data.interviewersAvailable}</td>
+          <td class="number-cell ${data.interviewerGap < 0 ? 'warning' : 'positive'}">${Math.round(data.interviewerGap) > 0 ? '+' : ''}${Math.round(data.interviewerGap)}</td>
         `;
         tbody.appendChild(row);
       });
@@ -950,75 +957,6 @@
           }
         }
       });
-    }
-
-    function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-
-      // Dashboard sheet
-      const dashboardData = [
-        ['CHRO AOP Planner — Executive View'],
-        [],
-        ['Dashboard Metrics'],
-        ['Starting HC', parseFloat(document.getElementById('startingHC').value)],
-        ['Target EOY HC', parseFloat(document.getElementById('targetHC').value)],
-        ['Total Hires Required', monthlyData.reduce((sum, m) => sum + m.plannedHires, 0)],
-        ['Total Attrition', monthlyData.reduce((sum, m) => sum + m.attrition, 0)],
-        ['Ending HC', monthlyData[11].endingHC],
-        ['Gap to Target', parseFloat(document.getElementById('targetHC').value) - monthlyData[11].endingHC],
-        []
-      ];
-
-      const dashboardWs = XLSX.utils.aoa_to_sheet(dashboardData);
-      XLSX.utils.book_append_sheet(wb, dashboardWs, 'Dashboard');
-
-      // Monthly Plan sheet
-      const monthlyHeaders = [
-        ['Month', 'Starting HC', 'Planned Hires', 'Attrition', 'Ending HC', 'Target HC', 'Gap', 'Time-to-Fill', 
-         'Applications', 'Screens', 'Interviews', 'Offers', 'Interviewers Needed', 'Interviewers Available', 'Interviewer Gap']
-      ];
-      
-      const monthlyRows = monthlyData.map(d => [
-        d.month,
-        d.startingHC,
-        d.plannedHires,
-        d.attrition,
-        d.endingHC,
-        parseFloat(document.getElementById('targetHC').value),
-        d.gap,
-        d.timeToFill,
-        d.applications,
-        d.screens,
-        d.interviews,
-        d.offers,
-        d.interviewersNeeded,
-        d.interviewersAvailable,
-        d.interviewerGap
-      ]);
-
-      const monthlyWs = XLSX.utils.aoa_to_sheet([...monthlyHeaders, ...monthlyRows]);
-      XLSX.utils.book_append_sheet(wb, monthlyWs, 'Monthly Plan');
-
-      // Inputs sheet
-      const inputsData = [
-        ['Input Parameters'],
-        ['Starting Headcount', parseFloat(document.getElementById('startingHC').value)],
-        ['Target End-of-Year Headcount', parseFloat(document.getElementById('targetHC').value)],
-        ['Annual Attrition %', parseFloat(document.getElementById('attrition').value)],
-        ['Avg Time-to-Fill (Days)', parseFloat(document.getElementById('timeToFill').value)],
-        ['Screen → Interview %', parseFloat(document.getElementById('screenToInterview').value)],
-        ['Interview → Offer %', parseFloat(document.getElementById('interviewToOffer').value)],
-        ['Offer → Hire %', parseFloat(document.getElementById('offerToHire').value)],
-        ['Interviewers Available', parseFloat(document.getElementById('interviewersAvailable').value)],
-        ['Interviews per Interviewer / Month', parseFloat(document.getElementById('interviewsPerMonth').value)]
-      ];
-
-      const inputsWs = XLSX.utils.aoa_to_sheet(inputsData);
-      XLSX.utils.book_append_sheet(wb, inputsWs, 'Inputs');
-
-      // Download
-      const timestamp = new Date().toISOString().slice(0, 10);
-      XLSX.writeFile(wb, `CHRO_AOP_Plan_${timestamp}.xlsx`);
     }
   </script>
 </body>
