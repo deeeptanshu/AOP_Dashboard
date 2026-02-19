@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CHRO AOP Planner — Executive Dashboard</title>
+  <title>Pulse of Action (POA) Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -117,7 +117,7 @@
     /* KPI Strip - Super Compact */
     .kpi-strip {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 0.65rem;
       margin-bottom: 1rem;
     }
@@ -355,7 +355,7 @@
       }
 
       .kpi-strip {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .charts-grid {
@@ -399,7 +399,7 @@
     <!-- Header -->
     <div class="header">
       <div class="header-content">
-        <h1>CHRO AOP Planner</h1>
+        <h1>Pulse of Action (POA) Dashboard</h1>
         <p class="subtitle">Executive Workforce Planning Dashboard</p>
       </div>
       <a href="https://docs.google.com/spreadsheets/d/1YicOK3KZ4wysN8SlWAqXiciYDrgIXzzIdeQXFlFwQjw/edit?gid=0#gid=0" target="_blank" class="export-btn">
@@ -416,9 +416,9 @@
       </div>
 
       <div class="kpi-card" style="border-top-color: #f59e0b;">
-        <span class="kpi-label">Peak Shortfall</span>
-        <span class="kpi-value" id="kpi-peak-shortfall">0</span>
-        <span class="kpi-subtext">Max recruiters</span>
+        <span class="kpi-label">Interviewer Shortfall</span>
+        <span class="kpi-value" id="kpi-interviewer-shortfall">0</span>
+        <span class="kpi-subtext">Avg monthly gap</span>
       </div>
 
       <div class="kpi-card" style="border-top-color: #6366f1;">
@@ -431,12 +431,6 @@
         <span class="kpi-label">Ending HC</span>
         <span class="kpi-value" id="kpi-ending-hc">150</span>
         <span class="kpi-subtext">Year-end</span>
-      </div>
-
-      <div class="kpi-card" style="border-top-color: #8b5cf6;">
-        <span class="kpi-label">Gap to AOP</span>
-        <span class="kpi-value" id="kpi-gap">0</span>
-        <span class="kpi-subtext">Variance</span>
       </div>
     </div>
 
@@ -487,7 +481,7 @@
         </div>
 
         <div class="input-group">
-          <label class="input-label">Interviews/Interviewer/Mo</label>
+          <label class="input-label">Interviewer Capacity/Month</label>
           <input type="number" id="interviewsPerMonth" value="6" min="1">
         </div>
 
@@ -636,13 +630,15 @@
       const endingHC = monthlyData[11].endingHC;
       const targetHC = parseFloat(document.getElementById('targetHC').value);
       const gap = targetHC - endingHC;
-      const peakShortfall = Math.max(...monthlyData.map(m => Math.abs(Math.min(0, m.interviewerGap))));
+      
+      // Calculate average interviewer shortfall (only negative gaps)
+      const shortfalls = monthlyData.map(m => Math.abs(Math.min(0, m.interviewerGap)));
+      const avgShortfall = shortfalls.reduce((sum, val) => sum + val, 0) / 12;
 
       document.getElementById('kpi-total-hires').textContent = totalHires;
-      document.getElementById('kpi-peak-shortfall').textContent = Math.round(peakShortfall);
+      document.getElementById('kpi-interviewer-shortfall').textContent = Math.round(avgShortfall);
       document.getElementById('kpi-attrition').textContent = totalAttrition;
       document.getElementById('kpi-ending-hc').textContent = endingHC;
-      document.getElementById('kpi-gap').textContent = gap;
     }
 
     function updateTable() {
