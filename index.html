@@ -348,6 +348,99 @@
       color: var(--warning);
     }
 
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      border-radius: 10px;
+      padding: 1.75rem 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .cta-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      opacity: 0.12;
+      border-radius: 50%;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 16px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+
+    .cta-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: white;
+      margin-bottom: 0.6rem;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+    }
+
+    .cta-subtext {
+      font-size: 0.95rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+      font-weight: 300;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 6px;
+      font-family: 'Work Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px 0 rgba(249, 115, 22, 0.35);
+      border: 2px solid var(--accent);
+    }
+
+    .cta-button:hover {
+      background: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px 0 rgba(249, 115, 22, 0.45);
+      border-color: var(--accent-light);
+    }
+
+    .cta-trust {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.65);
+      font-weight: 400;
+      font-style: italic;
+    }
+
     /* Responsive */
     @media (max-width: 1200px) {
       .main-grid {
@@ -385,11 +478,49 @@
       .export-btn {
         width: 100%;
       }
+
+      .cta-banner {
+        padding: 1.5rem 1.25rem;
+        margin-top: 1.25rem;
+      }
+
+      .cta-headline {
+        font-size: 1.35rem;
+      }
+
+      .cta-subtext {
+        font-size: 0.88rem;
+        margin-bottom: 1rem;
+      }
+
+      .cta-button {
+        padding: 0.7rem 1.75rem;
+        font-size: 0.9rem;
+        width: 100%;
+        max-width: 280px;
+      }
+
+      .cta-trust {
+        font-size: 0.7rem;
+      }
     }
 
     @media (max-width: 480px) {
       .kpi-strip {
         grid-template-columns: 1fr;
+      }
+
+      .cta-headline {
+        font-size: 1.2rem;
+      }
+
+      .cta-subtext {
+        font-size: 0.85rem;
+      }
+
+      .cta-badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.7rem;
       }
     }
   </style>
@@ -553,6 +684,19 @@
         <tbody id="tableBody">
         </tbody>
       </table>
+    </div>
+
+    <!-- CTA Banner -->
+    <div class="cta-banner">
+      <div class="cta-content">
+        <div class="cta-badge">Save 20–40% of interview time</div>
+        <h2 class="cta-headline">Facing an interviewer bandwidth crunch?</h2>
+        <p class="cta-subtext">Scale hiring without overloading your team by outsourcing interviews with Intervue.</p>
+        <a href="https://www.intervue.io/business-book-a-demo" target="_blank" class="cta-button">
+          Book a Demo
+        </a>
+        <p class="cta-trust">Trusted by fast-scaling engineering teams</p>
+      </div>
     </div>
   </div>
 
